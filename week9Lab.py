@@ -20,8 +20,8 @@ imgOut = cv2.GaussianBlur(gray_image,(3, 3),0)
 imgOut2 = cv2.GaussianBlur(gray_image,(13,13),0)
 
 
-sobelHorizontal = cv2.Sobel(image,cv2.CV_64F,1,0,ksize=5)  # x dir 
-sobelVertical   = cv2.Sobel(image,cv2.CV_64F,0,1,ksize=5)  # y dir 
+sobelHorizontal = cv2.Sobel(gray_image,cv2.CV_64F,1,0,ksize=5)  # x dir 
+sobelVertical   = cv2.Sobel(gray_image,cv2.CV_64F,0,1,ksize=5)  # y dir 
 
 canny = cv2.Canny(image,150,300) 
 sobelSum = cv2.addWeighted(sobelHorizontal,0.5,sobelVertical,0.5,0)
@@ -49,5 +49,30 @@ plt.title('Sobel Sum'), plt.xticks([]), plt.yticks([])
 
 plt.subplot(nrows, ncols,6),plt.imshow(canny, cmap = 'gray') 
 plt.title('Canny Edge Image'), plt.xticks([]), plt.yticks([]) 
+
+threshold = 100
+binary = np.zeros(sobelSum.shape)
+
+for i in range(sobelSum.shape[0]):
+    for j in range(sobelSum.shape[1]):
+        if sobelSum[i, j] > threshold:
+            binary[i, j] = 1
+
+plt.figure()
+plt.imshow(binary, cmap='gray')
+plt.title('Threshold ' + str(threshold))
+
+rows, cols = gray_image.shape
+edges = np.zeros((rows, cols))
+
+for i in range(rows - 1):
+    for j in range(cols - 1):
+        dx = int(gray_image[i, j+1]) - int(gray_image[i, j])
+        dy = int(gray_image[i+1, j]) - int(gray_image[i, j])
+        edges[i, j] = abs(dx) + abs(dy)
+
+plt.figure()
+plt.imshow(edges, cmap='gray')
+plt.title('My Edge Detector')
 
 plt.show()
